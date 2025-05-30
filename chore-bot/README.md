@@ -1,15 +1,53 @@
-# Chore-Bot 🏠
+# lxmchores
 
-A Slack bot built on Cloudflare Workers that manages household chore rotations with AI-powered natural language processing and Google Calendar integration.
+A Slack bot built on Cloudflare Workers that manages household chore rotations with AI-powered natural language processing and Google Calendar integration. Features a web interface for real-time chore status viewing.
 
 ## Features
 
 - 📅 **Automated Chore Rotation**: Manages who's turn it is for chores
 - 🤖 **AI-Powered Commands**: Uses OpenAI GPT-4 with function calling for natural language interactions
 - 📆 **Calendar Integration**: Creates Google Calendar events for chore reminders
-- ⏰ **Scheduled Reminders**: Sends daily reminders via cron triggers
+- ⏰ **Scheduled Reminders**: Sends daily reminders via cron triggers (9 AM and 7 PM)
+- 🌐 **Web Interface**: Real-time web dashboard showing current chore status
+- 📊 **REST API**: HTTP endpoints for external integrations
 - 🔒 **Secure**: Verifies Slack request signatures and uses encrypted secrets
-- 💾 **Persistent State**: Uses Cloudflare Durable Objects for consistent state management
+- 💾 **Persistent State**: Uses Cloudflare Durable Objects with automatic daily backups
+- 🧪 **Testing**: Vitest integration with Cloudflare Workers pool
+
+## Architecture
+
+```
+┌─── Cloudflare Workers Runtime ───┐
+│                                  │
+│  ┌─ Entry Point (index.ts) ────┐ │
+│  │  • /slack (webhook)         │ │
+│  │  • /api/chores (REST API)   │ │
+│  │  • / (web interface)        │ │
+│  │  • /health (health check)   │ │
+│  │  • Cron triggers            │ │
+│  └─────────────────────────────┘ │
+│                                  │
+│  ┌─ Core Modules ──────────────┐ │
+│  │  • slack.ts (Slack API)     │ │
+│  │  • openai.ts (GPT-4)        │ │
+│  │  • state.ts (Durable Object)│ │
+│  │  • utils.ts (Calendar/GCP)  │ │
+│  │  • scheduler.ts (Cron)      │ │
+│  │  • api.ts (REST endpoints)  │ │
+│  └─────────────────────────────┘ │
+│                                  │
+│  ┌─ Static Assets (public/) ───┐ │
+│  │  • index.html (dashboard)   │ │
+│  │  • rusty.jpeg (bot avatar)  │ │
+│  └─────────────────────────────┘ │
+└──────────────────────────────────┘
+
+┌─ External Services ─┐
+│  • OpenAI GPT-4     │
+│  • Google Calendar  │
+│  • Slack Workspace  │
+└─────────────────────┘
+```
 
 ## Setup
 
@@ -134,38 +172,106 @@ The bot understands natural language through OpenAI GPT-4:
 /rusty create a reminder for this weekend
 ```
 
+### Web Interface
+
+Visit your deployed worker URL to see the live chore dashboard:
+
+- Real-time chore status updates
+- Rusty's avatar and speech bubble interface
+- Auto-refresh every 5 minutes
+- Mobile-responsive design
+
+### API Endpoints
+
+```bash
+# Get current chore state
+GET /api/chores
+
+# Health check
+GET /health
+
+# Slack webhook
+POST /slack
+```
+
 ## Scheduled Reminders
 
-The bot automatically sends reminders at 9 AM and 7 PM daily (configurable in `wrangler.jsonc`).
+The bot automatically sends reminders at 9 AM and 7 PM daily (configured in `wrangler.jsonc` cron triggers).
 
 ## Development
 
 ```bash
-# Run locally
+# Run locally with hot reload
 npm run dev
 
 # Type checking
 npx tsc --noEmit
 
-# Deploy
+# Run tests
+npm test
+
+# Generate Cloudflare Worker types
+npm run cf-typegen
+
+# Deploy to production
 npm run deploy
 ```
 
-## Architecture
+## Project Structure
 
-- **Cloudflare Workers**: Serverless runtime for the bot
-- **Durable Objects**: Persistent state management
-- **OpenAI GPT-4**: Natural language processing with function calling
-- **Google Calendar API**: Event creation
-- **Slack API**: Message handling and user interaction
+```
+chore-bot/
+├── src/
+│   ├── index.ts          # Main entry point and routing
+│   ├── slack.ts          # Slack API integration (310 lines)
+│   ├── openai.ts         # OpenAI GPT-4 function calling (333 lines)
+│   ├── state.ts          # Durable Object for state management
+│   ├── utils.ts          # Google Calendar & utility functions
+│   ├── scheduler.ts      # Cron job handling
+│   ├── api.ts           # REST API endpoints
+│   └── types.ts         # TypeScript interfaces
+├── public/
+│   ├── index.html       # Web dashboard (195 lines)
+│   └── rusty.jpeg       # Bot avatar image
+├── wrangler.jsonc       # Cloudflare Workers configuration
+├── package.json         # Dependencies and scripts
+├── tsconfig.json        # TypeScript configuration
+├── vitest.config.mts    # Test configuration
+└── README.md           # This file
+```
+
+## State Management
+
+The bot uses Cloudflare Durable Objects for persistent state with:
+
+- **Primary state**: Current chore rotation and assignments
+- **Automatic backups**: Daily backups with timestamps
+- **Manual backups**: Available via `/backup` endpoint
+- **State validation**: Type-safe state updates
+- **Atomic operations**: Consistent state management
 
 ## Configuration
 
 Edit `wrangler.jsonc` to customize:
 
-- Cron schedules for reminders
-- Environment variables
-- Compatibility dates
+- **Cron schedules**: Modify reminder times
+- **Environment variables**: Set production/development flags
+- **Compatibility dates**: Update Worker runtime features
+- **Durable Object bindings**: Configure state management
+
+## Testing
+
+The project includes Vitest with Cloudflare Workers integration:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+Tests are configured to run in the Cloudflare Workers environment using `@cloudflare/vitest-pool-workers`.
 
 ## Troubleshooting
 
@@ -175,8 +281,9 @@ Edit `wrangler.jsonc` to customize:
 2. **Calendar API errors**: Verify service account permissions
 3. **OpenAI errors**: Check API key and billing status
 4. **State not persisting**: Ensure Durable Objects are properly configured
+5. **Web interface not loading**: Check static asset configuration
 
-### Logs
+### Debugging
 
 ```bash
 # View real-time logs
@@ -184,7 +291,17 @@ wrangler tail
 
 # View specific deployment logs
 wrangler tail --format=pretty
+
+# Local development with debugging
+npm run dev
 ```
+
+### Health Monitoring
+
+- **Health endpoint**: `GET /health` returns 200 OK
+- **API status**: `GET /api/chores` shows current state
+- **Console logs**: Structured logging with timestamps
+- **Error tracking**: Comprehensive error handling and logging
 
 ## License
 
