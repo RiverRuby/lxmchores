@@ -112,7 +112,7 @@ async function handleChoresCommand(command: SlackCommand, env: Env, ctx?: Execut
 
 	// Respond immediately to avoid Slack timeout
 	const immediateResponse = {
-		response_type: 'ephemeral',
+		response_type: 'in_channel',
 		text: '🤖 Processing your request...',
 	};
 

@@ -235,12 +235,11 @@ Current date: ${new Date().toISOString()}`;
 		const nextIndex = (state.currentIndex + 1) % state.rotation.length;
 		const nextPerson = state.rotation[nextIndex] || 'No one next';
 
-		return `📋 **Current Chore Status**
-👤 **Current:** ${currentPerson}
-👤 **Next:** ${nextPerson}
-🏠 **Chores:** ${state.chores.join(', ')}
-🔄 **Rotation:** ${state.rotation.join(' → ')}
-⏰ **Last Updated:** ${new Date(state.lastUpdated).toLocaleDateString()}`;
+		return `📋 *Current Chore Status*
+👤 *Current:* ${currentPerson}, Next: ${nextPerson}
+🏠 *Chores:* ${state.chores.join(', ')}
+🔄 *Rotation:* ${state.rotation.join(' → ')}
+⏰ *Last Updated:* ${new Date(state.lastUpdated).toLocaleDateString()}`;
 	}
 
 	private async writeState(updates: Partial<ChoreState>): Promise<string> {
@@ -266,7 +265,7 @@ Current date: ${new Date().toISOString()}`;
 			})
 		);
 
-		return `✅ **State Updated Successfully**
+		return `✅ *State Updated Successfully*
 ${updates.rotation ? `🔄 Rotation updated: ${updates.rotation.join(' → ')}` : ''}
 ${updates.chores ? `🏠 Chores updated: ${updates.chores.join(', ')}` : ''}
 ${updates.currentIndex !== undefined ? `👤 Current person: ${newState.rotation[newState.currentIndex]}` : ''}`;
@@ -302,7 +301,7 @@ ${updates.currentIndex !== undefined ? `👤 Current person: ${newState.rotation
 				throw new Error(`Calendar API error: ${errorText}`);
 			}
 
-			return `📅 **Calendar Event Created**
+			return `📅 *Calendar Event Created*
 📝 ${args.summary}
 🕐 ${new Date(args.startDateTime).toLocaleString()}`;
 		} catch (error) {
