@@ -44,7 +44,7 @@ npm install -g wrangler
 
 5. In **Slash Commands**:
 
-   - Create `/chores` command
+   - Create `/rusty` command
    - Request URL: `https://your-worker.your-subdomain.workers.dev/slack`
 
 6. In **Basic Information**:
@@ -67,18 +67,18 @@ Set up your secrets using Wrangler:
 
 ```bash
 # Slack secrets
-wrangler secret put SLACK_BOT_TOKEN
+npx wrangler secret put SLACK_BOT_TOKEN
 # Paste your xoxb- token
 
-wrangler secret put SLACK_SIGNING_SECRET
+npx wrangler secret put SLACK_SIGNING_SECRET
 # Paste your signing secret
 
 # OpenAI API key
-wrangler secret put OPENAI_API_KEY
+npx wrangler secret put OPENAI_API_KEY
 # Paste your OpenAI API key
 
 # Google service account (paste the entire JSON)
-wrangler secret put GCP_SERVICE_ACCOUNT
+npx wrangler secret put GCP_SERVICE_ACCOUNT
 # Paste the entire service account JSON
 ```
 
@@ -107,19 +107,19 @@ npm run deploy
 
 ```bash
 # Check current rotation status
-/chores status
+/rusty status
 
 # Update rotation with new people
-/chores set rotation Alice Bob Charlie
+/rusty set rotation Alice Bob Charlie
 
 # Update chore list
-/chores set chores "take out trash, do dishes, vacuum living room"
+/rusty set chores "take out trash, do dishes, vacuum living room"
 
 # Move to next person in rotation
-/chores next
+/rusty next
 
 # Create a calendar reminder
-/chores calendar "Chore reminder" tomorrow 9am
+/rusty calendar "Chore reminder" tomorrow 9am
 ```
 
 ### Natural Language
@@ -127,11 +127,11 @@ npm run deploy
 The bot understands natural language through OpenAI GPT-4:
 
 ```bash
-/chores who's turn is it?
-/chores add Dave to the rotation
-/chores what are today's chores?
-/chores skip to the next person
-/chores create a reminder for this weekend
+/rusty who's turn is it?
+/rusty add Dave to the rotation
+/rusty what are today's chores?
+/rusty skip to the next person
+/rusty create a reminder for this weekend
 ```
 
 ## Scheduled Reminders

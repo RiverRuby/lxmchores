@@ -104,10 +104,10 @@ Current date: ${new Date().toISOString()}`;
 	async processCommand(text: string): Promise<string> {
 		try {
 			const completion = await this.openai.chat.completions.create({
-				model: 'gpt-4',
+				model: 'gpt-4o',
 				messages: [
 					{ role: 'system', content: this.getSystemPrompt() },
-					{ role: 'user', content: `Slash command: /chores ${text}` },
+					{ role: 'user', content: `Slash command: /rusty ${text}` },
 				],
 				tools: this.getTools(),
 				tool_choice: 'auto',
@@ -129,7 +129,7 @@ Current date: ${new Date().toISOString()}`;
 	async processMessage(text: string, userId?: string): Promise<string> {
 		try {
 			const completion = await this.openai.chat.completions.create({
-				model: 'gpt-4',
+				model: 'gpt-4o',
 				messages: [
 					{ role: 'system', content: this.getSystemPrompt() },
 					{ role: 'user', content: `Message from user ${userId}: ${text}` },

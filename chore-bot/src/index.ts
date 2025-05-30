@@ -27,7 +27,7 @@ export default {
 			switch (url.pathname) {
 				case '/slack':
 					console.log('🎯 Routing to Slack webhook handler');
-					return handleSlackWebhook(request, env);
+					return handleSlackWebhook(request, env, ctx);
 				case '/health':
 					console.log('💚 Health check requested');
 					return new Response('OK', { status: 200 });
