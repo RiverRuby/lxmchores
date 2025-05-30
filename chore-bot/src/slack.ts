@@ -113,7 +113,6 @@ async function handleChoresCommand(command: SlackCommand, env: Env, ctx?: Execut
 	// Respond immediately to avoid Slack timeout
 	const immediateResponse = {
 		response_type: 'in_channel',
-		text: '🤖 Processing your request...',
 	};
 
 	// Process the request asynchronously
@@ -140,13 +139,11 @@ async function handleChoresCommand(command: SlackCommand, env: Env, ctx?: Execut
 			const delayedResponse = {
 				response_type: 'in_channel',
 				text: response,
-				replace_original: true,
 			};
 
 			console.log('📤 About to send delayed response to Slack via response_url:', {
 				url: command.response_url,
 				responseType: delayedResponse.response_type,
-				replaceOriginal: delayedResponse.replace_original,
 				textLength: delayedResponse.text.length,
 			});
 

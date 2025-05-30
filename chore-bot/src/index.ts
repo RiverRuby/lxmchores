@@ -8,6 +8,7 @@ import { Env } from './types';
 import { StateDO } from './state';
 import { handleSlackWebhook } from './slack';
 import { handleScheduledReminder } from './scheduler';
+import { handleChoreStateAPI } from './api';
 
 export { StateDO };
 
@@ -28,12 +29,21 @@ export default {
 				case '/slack':
 					console.log('🎯 Routing to Slack webhook handler');
 					return handleSlackWebhook(request, env, ctx);
+				case '/api/chores':
+					console.log('📋 API request for chore state');
+					return handleChoreStateAPI(request, env);
 				case '/health':
 					console.log('💚 Health check requested');
 					return new Response('OK', { status: 200 });
+				case '/':
+				case '/index.html':
+					console.log('🏠 Serving frontend');
+					// Let the default asset handler serve the HTML file
+					return env.ASSETS.fetch(request);
 				default:
-					console.log('❓ Unknown route:', url.pathname);
-					return new Response('Not Found', { status: 404 });
+					console.log('❓ Unknown route, trying assets:', url.pathname);
+					// Try to serve static assets (like rusty.jpeg)
+					return env.ASSETS.fetch(request);
 			}
 		} catch (error) {
 			console.error('💥 Request handling error:', error);

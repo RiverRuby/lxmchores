@@ -8,17 +8,19 @@ export interface Env {
 	// Durable Object binding
 	STATE: DurableObjectNamespace;
 
+	// Static assets binding
+	ASSETS: {
+		fetch: typeof fetch;
+	};
+
 	// Environment variables
 	ENVIRONMENT: string;
 }
 
 export interface ChoreState {
-	rotation: string[];
-	currentIndex: number;
-	lastSent: string | null;
-	chores: string[];
-	calendarId?: string;
+	description: string;
 	lastUpdated: string;
+	lastSent?: string;
 }
 
 export interface SlackEvent {

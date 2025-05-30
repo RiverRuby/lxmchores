@@ -10,11 +10,11 @@ export class StateDO {
 	}
 
 	async fetch(request: Request): Promise<Response> {
-		const url = new URL(request.url);
-		const method = request.method;
-
 		try {
-			switch (url.pathname) {
+			const url = new URL(request.url);
+			const path = url.pathname;
+
+			switch (path) {
 				case '/read':
 					return this.handleRead();
 				case '/write':
@@ -25,7 +25,7 @@ export class StateDO {
 					return new Response('Not Found', { status: 404 });
 			}
 		} catch (error) {
-			console.error('StateDO error:', error);
+			console.error('StateDO fetch error:', error);
 			return new Response('Internal Server Error', { status: 500 });
 		}
 	}
@@ -86,10 +86,7 @@ export class StateDO {
 		if (!stored) {
 			// Initialize with default state
 			const defaultState: ChoreState = {
-				rotation: [],
-				currentIndex: 0,
-				lastSent: null,
-				chores: [],
+				description: 'No chore rotation has been set up yet. The system is ready to track household chores and responsibilities.',
 				lastUpdated: new Date().toISOString(),
 			};
 			await this.state.storage.put('choreState', defaultState);
@@ -102,29 +99,16 @@ export class StateDO {
 	private validateState(state: any): state is ChoreState {
 		return (
 			typeof state === 'object' &&
-			Array.isArray(state.rotation) &&
-			typeof state.currentIndex === 'number' &&
-			Array.isArray(state.chores) &&
-			(state.lastSent === null || typeof state.lastSent === 'string') &&
-			state.currentIndex >= 0 &&
-			state.currentIndex < state.rotation.length
+			typeof state.description === 'string' &&
+			typeof state.lastUpdated === 'string' &&
+			(state.lastSent === undefined || state.lastSent === null || typeof state.lastSent === 'string')
 		);
 	}
 
-	// Helper method to get next person in rotation
-	async getNextPerson(): Promise<string | null> {
+	// Helper method to update state with new description
+	async updateDescription(description: string): Promise<ChoreState> {
 		const state = await this.getState();
-		if (state.rotation.length === 0) return null;
-
-		return state.rotation[state.currentIndex];
-	}
-
-	// Helper method to advance rotation
-	async advanceRotation(): Promise<ChoreState> {
-		const state = await this.getState();
-		if (state.rotation.length === 0) return state;
-
-		state.currentIndex = (state.currentIndex + 1) % state.rotation.length;
+		state.description = description;
 		state.lastUpdated = new Date().toISOString();
 
 		await this.state.storage.put('choreState', state);
