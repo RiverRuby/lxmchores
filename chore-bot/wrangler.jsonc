@@ -1,0 +1,53 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "chore-bot",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-05-29",
+	"compatibility_flags": ["global_fetch_strictly_public"],
+	"assets": {
+		"directory": "./public"
+	},
+	"observability": {
+		"enabled": true
+	},
+
+	/**
+	 * Secrets for Slack and GCP integration
+	 */
+	"vars": {
+		"ENVIRONMENT": "production"
+	},
+
+	/**
+	 * Durable Objects for state management
+	 */
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "STATE",
+				"class_name": "StateDO"
+			}
+		]
+	},
+
+	/**
+	 * Durable Objects migrations
+	 */
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["StateDO"]
+		}
+	],
+
+	/**
+	 * Cron triggers for daily reminders
+	 */
+	"triggers": {
+		"crons": ["0 9 * * *", "0 19 * * *"]
+	}
+}
